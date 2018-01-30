@@ -3,7 +3,68 @@
 
 // Implement your solutions here.
 
+auto max(const std::string& s0, const std::string& s1) {
+  return s0.size() > s1.size() ? s0 : s1;
+}
 
+template <typename... Args>
+auto max(const std::string& s, const Args&... args) {
+  return max(s, max(args...));
+}
+
+template <typename T, typename U>
+constexpr auto max(const T& a, const U& b) {
+  return a > b ? a : b;
+}
+
+template <typename T, typename... Args>
+constexpr auto max(const T& a, const Args&... args) {
+  auto x = max(args...);
+  return a > x ? a : x;
+};
+
+template <int N>
+struct fib {
+  static_assert(N >= 0, "");
+  constexpr static size_t value = fib<N - 1>::value + fib<N - 2>::value;
+};
+
+template <>
+struct fib<0> {
+  constexpr static size_t value = 0;
+};
+
+template <>
+struct fib<1> {
+  constexpr static size_t value = 1;
+};
+
+namespace impl {
+
+// Naive version, but works for a small numbers.
+template <int S, size_t N>
+struct is_fib_ {
+  constexpr static bool value =
+      fib<S>::value == N ? true : is_fib_<S - 1, N>::value;
+};
+
+template <size_t N>
+struct is_fib_<0, N> {
+  constexpr static bool value = false;
+};
+}  // namespace impl
+
+template <size_t N>
+struct is_fib {
+  static_assert(N >= 0, "");
+  constexpr static bool value =
+      fib<N>::value == N ? true : impl::is_fib_<N - 1, N>::value;
+};
+
+template <>
+struct is_fib<0> {
+  constexpr static bool value = true;
+};
 
 auto main() -> int {
   using namespace std::string_literals;
@@ -13,39 +74,39 @@ auto main() -> int {
 
   // Ex. 1.1
   // Write max function that compares different types.
-//  static_assert(::max(4, 5) == 5, "");
-//  static_assert(::max(3, 4.7) == 4.7, "");
-//  static_assert(::max(3.f, 42.7) == 42.7, "");
+  static_assert(::max(4, 5) == 5, "");
+  static_assert(::max(3, 4.7) == 4.7, "");
+  static_assert(::max(3.f, 42.7) == 42.7, "");
 
   // Ex. 1.2
   // Write max function that compares multiple values of different types.
-//  static_assert(::max(4, 5, 6, 7.6) == 7.6, "");
-//  static_assert(::max(4, 5, 6.f, 700.6, 234.34) == 700.6, "");
+  static_assert(::max(4, 5, 6, 7.6) == 7.6, "");
+  static_assert(::max(4, 5, 6.f, 700.6, 234.34) == 700.6, "");
 
   // Ex. 1.3
   // Add overload which returns the longest string.
-//  assert(::max("aaaa"s, "bb"s) == "aaaa"s);
-//  assert(::max("aaaa"s, "bb"s, "veryLongString"s) == "veryLongString"s);
-//  assert("aaaa"s < "b"s); // But outside the max() we want our default behaviour back.
+  assert(::max("aaaa"s, "bb"s) == "aaaa"s);
+  assert(::max("aaaa"s, "bb"s, "veryLongString"s) == "veryLongString"s);
+  assert("aaaa"s < "b"s); // But outside the max() we want our default behaviour back.
 
   // Ex 2.1
   // Compute Fibonacci numbers.
-//  static_assert(fib<5>::value == 5, "");
-//  static_assert(fib<6>::value == 8, "");
-//  static_assert(fib<8>::value == 21, "");
-//  static_assert(fib<10>::value == 55, "");
-//  static_assert(fib<15>::value == 610, "");
+  static_assert(fib<5>::value == 5, "");
+  static_assert(fib<6>::value == 8, "");
+  static_assert(fib<8>::value == 21, "");
+  static_assert(fib<10>::value == 55, "");
+  static_assert(fib<15>::value == 610, "");
 
   // Ex. 2.2 - optional
   // Check if a number exists in Fibonacci series.
-//  static_assert(is_fib<0>::value, "");
-//  static_assert(is_fib<1>::value, "");
-//  static_assert(is_fib<5>::value, "");
-//  static_assert(is_fib<7>::value == false, "");
-//  static_assert(is_fib<8>::value, "");
-//  static_assert(is_fib<10>::value == false, "");
-//  static_assert(is_fib<13>::value, "");
-//  static_assert(is_fib<144>::value, "");
+  static_assert(is_fib<0>::value, "");
+  static_assert(is_fib<1>::value, "");
+  static_assert(is_fib<5>::value, "");
+  static_assert(is_fib<7>::value == false, "");
+  static_assert(is_fib<8>::value, "");
+  static_assert(is_fib<10>::value == false, "");
+  static_assert(is_fib<13>::value, "");
+  static_assert(is_fib<144>::value, "");
 
   return 0;
 }
